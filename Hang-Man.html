@@ -1,0 +1,131 @@
+<!doctype html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>
+      Hangman
+    </title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card bg-info text-white" style="text-align:center">
+        <div class="card-body">
+          <div class="card-body">
+            <h5>Play the Hangman game!</h5>
+          </div>
+          <div class="card-body">
+            <div>
+              Input the word to be guessed!
+            </div>
+            <input type="text" id="myText" value=""> <button class="btn btn-primary" onclick="saveWordToGuess(); this.onclick = null">Submit</button>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <p id="unrevealedWord" style="font-size: 30px"></p>
+        <div class="card-body">
+          <div class="card-columns mx-auto d-flex justify-content-center col-12">
+            <div class="card text-center col-4">
+              <div class="card-body" style="text-align:center">
+                <div>
+                  <p id="title"></p>
+                </div>
+                <div>
+                  <p id="keyboard"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p id="status"></p>
+          <div id="playAgainBtn">
+          </div>
+        </div> 
+      </div>
+    </div>
+
+    <script>
+      const alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
+      let gameEnd = false;
+      let wordToGuess;
+      let unrevealedWordToGuess = [];
+      let clickedLetters = [];
+      let triesLeft = 15;
+      let lettersCnt = 0;
+      
+      function saveWordToGuess() {
+        wordToGuess = document.getElementById("myText").value;
+        document.getElementById("myText").value = "";
+        for (let index = 0; index < wordToGuess.length; ++index) {
+          unrevealedWordToGuess.push("_");
+        }
+        createKeyboard();
+      }
+
+      function createKeyboard() {
+        document.getElementById("unrevealedWord").innerHTML = unrevealedWordToGuess;
+        document.getElementById("title").innerHTML = "Choose a letter!"
+        document.getElementById("status").innerHTML = "Tries left: " + triesLeft;
+        for (let index = 0; index < alphabet.length; ++index) {
+          const button = document.createElement("button");
+          button.innerText = alphabet[index];
+          button.value = alphabet[index];
+          button.addEventListener("click", function() {
+            if (gameEnd == false) {
+              checkLetter(button.value);
+            }
+          });
+          document.body-keyboard.appendChild(button);
+        }
+      }
+
+      function checkLetter(letter) {
+        if (wordToGuess.indexOf(letter) < 0) {
+          --triesLeft;
+          document.getElementById("status").innerHTML = "Tries left: " + triesLeft;
+        } else if (clickedLetters.indexOf(letter) < 0) {
+          clickedLetters.push(letter);
+          revealLetters(letter);
+        }
+        gameStatus();
+        if (triesLeft <= 5) {
+          document.getElementById("status").style.color = "red";
+        }
+      }
+
+      function revealLetters(element) {
+        for(let index = wordToGuess.indexOf(element); index < wordToGuess.length; ++index) {
+          if (wordToGuess.charAt(index) == element) {
+            ++lettersCnt;
+            unrevealedWordToGuess[index] = element;
+          }
+        }
+        document.getElementById("unrevealedWord").innerHTML = unrevealedWordToGuess;
+      }
+ 
+      function playAgain() {
+        const button = document.createElement("button");
+        button.innerText = "Play again!";
+        button.addEventListener("click", function () {
+          location.reload();
+        });
+        document.body-playAgainBtn.appendChild(button);
+      }
+
+      function gameStatus() {
+        if (triesLeft == 0) {
+          gameEnd = true;
+          document.getElementById("unrevealedWord").style.color = "red";
+          document.getElementById("unrevealedWord").innerHTML = "You lose!";
+          playAgain();
+        } else if (lettersCnt == wordToGuess.length) {
+          gameEnd = true;
+          document.getElementById("unrevealedWord").style.color = "green";
+          document.getElementById("unrevealedWord").innerHTML = "You won!";
+          playAgain();
+        }
+      }
+    </script>
+  </body>
+</html>
